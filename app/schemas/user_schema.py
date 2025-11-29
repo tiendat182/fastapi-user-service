@@ -14,3 +14,5 @@ class UserRead(BaseModel):
     email: EmailStr
     fullname: Optional[str] = None
     created_at: datetime
+    class Config:
+        orm_mode = True
