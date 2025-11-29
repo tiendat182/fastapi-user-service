@@ -9,27 +9,26 @@ router = APIRouter()
 
 @router.post("/", response_model=dict)
 def create_user(user: UserCreate):
-    try:
-        db_user = UserService.create_user(user)
-        logger.info("Created user %s", db_user.username)
-        return success_response(db_user.__dict__, "User created successfully")
-    except Exception as e:
-        logger.error("Error creating user: %s", str(e))
-        return error_response("Failed to create user", 500)
+    db_user = UserService.create_user(user)
+    logger.info("Created user %s", db_user.username)
+    return success_response(db_user, "User created successfully")
 
 @router.get("/", response_model=dict)
 def list_users():
-    try:
-        users = UserService.get_users()
-        data = [u.__dict__ for u in users]
-        return success_response(data, "Users fetched successfully")
-    except Exception as e:
-        logger.error("Error fetching users: %s", str(e))
-        return error_response("Failed to fetch users", 500)
+    users = UserService.get_users()
+    return success_response(users, "Users fetched successfully")
 
 @router.get("/{user_id}", response_model=dict)
 def get_user(user_id: int):
     db_user = UserService.get_user_by_id(user_id)
-    if not db_user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return db_user
+    return success_response(db_user, "User fetched successfully")
+
+@router.put("/{user_id}", response_model=dict)
+def update_user(user_id: int, user: UserCreate):
+    db_user = UserService.update_user(user_id, user)
+    return success_response(db_user, "User updated successfully")
+
+@router.delete("/{user_id}", response_model=dict)
+def delete_user(user_id: int):
+    UserService.delete_user(user_id)
+    return success_response(None, "User deleted successfully")
