@@ -1,23 +1,42 @@
-# app/core/config.py
-from decouple import config
 import requests
+from .settings import settings
 
-class Settings:
-    APP_NAME: str = config("APP_NAME", default="fastapi-user-service")
-    APP_PORT: int = config("APP_PORT", default=8000, cast=int)
-    DB_USER: str = config("DB_USER")
-    DB_PASS: str = config("DB_PASS")
-    DB_DSN: str = config("DB_DSN")
-    CLOUD_CONFIG_URL: str = config("CLOUD_CONFIG_URL", default=None)
-    AUTO_REFRESH: bool = config("AUTO_REFRESH", default=False, cast=bool)
+
+class Config:
+    loaded_cloud = False  # Ngăn load lại nếu không bật AUTO_REFRESH
 
     def load_from_cloud(self):
-        if self.CLOUD_CONFIG_URL:
-            r = requests.get(self.CLOUD_CONFIG_URL)
-            if r.status_code == 200:
-                cloud_conf = r.json().get("propertySources", [])
-                for src in cloud_conf:
-                    for k, v in src["source"].items():
-                        setattr(self, k, v)
+        """Load config từ Cloud Config Server nếu có."""
+        if not settings.CLOUD_CONFIG_URL:
+            return
 
-settings = Settings()
+        if self.loaded_cloud and not settings.AUTO_REFRESH:
+            return
+
+        try:
+            r = requests.get(settings.CLOUD_CONFIG_URL, timeout=3)
+            if r.status_code == 200:
+                sources = r.json().get("propertySources", [])
+                for src in sources:
+                    for k, v in src.get("source", {}).items():
+                        setattr(settings, k, v)
+                self.loaded_cloud = True
+        except Exception as ex:
+            print(f"Cloud config not loaded: {ex}")
+
+    @property
+    def DB_DSN(self) -> str:
+        self.load_from_cloud()
+        return f"{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_SERVICE}"
+
+    @property
+    def DB_CONFIG(self) -> dict:
+        self.load_from_cloud()
+        return {
+            "user": settings.DB_USER,
+            "password": settings.DB_PASS,
+            "dsn": self.DB_DSN
+        }
+
+
+config = Config()

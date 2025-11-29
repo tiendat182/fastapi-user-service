@@ -1,16 +1,15 @@
 import oracledb
 from contextlib import contextmanager
-from app.core.config import settings  # nơi bạn để DB_USER, DB_PASSWORD, DB_DSN
+from app.core.config import settings, config  # nơi bạn để DB_USER, DB_PASS, DB_DSN
 
-# Nếu muốn pool connection, oracledb cũng hỗ trợ
+cfg = config.DB_CONFIG
 pool = oracledb.create_pool(
-    user=settings.DB_USER,
-    password=settings.DB_PASSWORD,
-    dsn=settings.DB_DSN,       # ví dụ "localhost:1521/XE"
+    user=cfg["user"],
+    password=cfg["password"],
+    dsn=cfg["dsn"],
     min=2,
-    max=10,
-    increment=1,
-    encoding="UTF-8"
+    max=5,
+    increment=1
 )
 
 @contextmanager
