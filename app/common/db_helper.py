@@ -48,3 +48,30 @@ def execute(sql: str, params: dict = None):
             cursor.close()
     except Exception as e:
         raise DatabaseException(f"Failed to execute SQL: {str(e)}")
+
+def fetch_page(sql_count: str, sql_data: str, page: int, size: int, model_class):
+    try:
+        with get_connection() as conn:
+            cursor = conn.cursor()
+
+            # Lấy tổng record
+            cursor.execute(sql_count)
+            total = cursor.fetchone()[0]
+
+            # Lấy data theo LIMIT + OFFSET
+            offset = (page - 1) * size
+            paginated_sql = f"""
+                {sql_data}
+                OFFSET {offset} ROWS
+                FETCH NEXT {size} ROWS ONLY
+            """
+            cursor.execute(paginated_sql)
+            rows = cursor.fetchall()
+            cursor.close()
+
+            items = [model_class.from_row(r) for r in rows]
+            return items, total
+
+    except Exception as e:
+        raise DatabaseException(f"Pagination query failed: {str(e)}")
+

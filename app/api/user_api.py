@@ -13,7 +13,7 @@ def create_user(user: UserCreate):
     logger.info("Created user %s", db_user.username)
     return success_response(db_user, "User created successfully")
 
-@router.get("/", response_model=dict)
+@router.get("/", response_model=dict, summary="Get all users")
 def list_users():
     users = UserService.get_users()
     return success_response(users, "Users fetched successfully")
@@ -32,3 +32,8 @@ def update_user(user_id: int, user: UserCreate):
 def delete_user(user_id: int):
     UserService.delete_user(user_id)
     return success_response(None, "User deleted successfully")
+
+@router.get("/paging/list", summary="Get users with pagination")
+def list_users_paging(page: int = 1, size: int = 10):
+    data = UserService.get_users_paging(page, size)
+    return success_response(data, "Users fetched successfully")

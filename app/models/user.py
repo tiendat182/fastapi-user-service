@@ -1,13 +1,12 @@
-# app/models/user.py
+from pydantic import BaseModel
 from datetime import datetime
 
-class User:
-    def __init__(self, id, username, email, fullname, created_at):
-        self.id = id
-        self.username = username
-        self.email = email
-        self.fullname = fullname
-        self.created_at = created_at
+class User(BaseModel):
+    id: int
+    username: str
+    email: str | None = None
+    fullname: str | None = None
+    created_at: datetime | None = None
 
     @classmethod
     def from_row(cls, row):

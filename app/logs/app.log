@@ -1,0 +1,9 @@
+2025-11-30 15:52:31,120 - user_service - INFO - Created user john
+2025-11-30 15:53:25,350 - user_service - INFO - Created user datlt
+2025-11-30 15:54:23,543 - user_service - ERROR - Unhandled error: Unable to serialize unknown type: <class 'app.models.user.User'>
+2025-11-30 16:02:44,851 - user_service - INFO - Created user datlt
+2025-11-30 16:03:16,814 - user_service - ERROR - Unhandled error: Unable to serialize unknown type: <class 'app.models.user.User'>
+2025-11-30 16:09:12,002 - user_service - ERROR - Unhandled error: Unable to serialize unknown type: <class 'app.models.user.User'>
+2025-11-30 16:24:35,886 - user_service - WARNING - Validation error: [{'type': 'int_parsing', 'loc': ('path', 'user_id'), 'msg': 'Input should be a valid integer, unable to parse string as an integer', 'input': 'paging'}]
+2025-11-30 16:24:59,562 - user_service - WARNING - Validation error: [{'type': 'int_parsing', 'loc': ('path', 'user_id'), 'msg': 'Input should be a valid integer, unable to parse string as an integer', 'input': 'paging'}]
+2025-11-30 16:29:04,490 - user_service - ERROR - Unhandled error: fetch_page() missing 1 required positional argument: 'model_class'

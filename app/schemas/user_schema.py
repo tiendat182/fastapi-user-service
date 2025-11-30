@@ -16,3 +16,4 @@ class UserRead(BaseModel):
     created_at: datetime
     class Config:
         from_attributes = True
+

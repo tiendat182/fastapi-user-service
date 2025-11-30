@@ -4,7 +4,8 @@ from app.common.exceptions import DatabaseException
 from app.core.database import get_connection
 from app.models.user import User
 from app.schemas.user_schema import UserCreate
-from app.common.db_helper import fetch_all, fetch_one, execute
+from app.common.db_helper import fetch_all, fetch_one, execute, fetch_page
+from app.common.pagination import Page
 
 class UserService:
 
@@ -19,7 +20,7 @@ class UserService:
         return user
 
     @staticmethod
-    def get_users():
+    def get_users() -> list[User]:
         sql = "SELECT ID, USERNAME, EMAIL, FULLNAME, CREATED_AT FROM USERS"
         return fetch_all(sql, User)
 
@@ -59,3 +60,10 @@ class UserService:
             cursor.execute("DELETE FROM USERS WHERE ID=:id", {"id": user_id})
             conn.commit()
             cursor.close()
+
+    @staticmethod
+    def get_users_paging(page: int = 1, size: int = 10) -> Page[User]:
+        sql_count = "SELECT COUNT(*) FROM USERS"
+        sql_data  = "SELECT ID, USERNAME, EMAIL, FULLNAME, CREATED_AT FROM USERS ORDER BY ID DESC"
+        items, total = fetch_page(sql_count, sql_data, page, size, User)
+        return Page.build(items, total, page, size)
